@@ -1,0 +1,55 @@
+apiVersion: scone/5.8
+kind: mesh
+
+cas:
+  - name: cas # cas used to store the policy of this application
+    alias: ["image", "security", "access", "attestation"] # use alias in case CAS instance has multiple roles
+    cas_url: edge.scone-cas.cf  # exported as {{cas_cas_cas_url}}
+    cas_key: 3ogw3WyHVPd6T656bXzAPoaJ4oTeohTCnAzmbYrjjrafZZpcPR # define explicit cas_key
+    tolerance: "--only_for_testing-trust-any --only_for_testing-debug  --only_for_testing-ignore-signer -C -G -S"
+
+policy:
+  namespace: myNamespace    # namespace on CAS instance `cas`
+  attestation_policy_name: security/policies/attestation # using CAS instance "attestation"
+  access_policy_name: security/policies/access      # using CAS instance  "access"
+  security_policy_name: security/policies/security  # using CAS instance "security"
+
+# define some key/value pairs used in handlebars   
+env:
+  - key: "session_secrets" 
+    value: "../secrets"
+  - key: "imagePullSecrets"    # kubernetes image pull secret
+    value: "sconeapps"         # to FASTAPI_CA_CERT
+  - key: "useSGXDevPlugin"     # kubernetes image pull secret
+    value: "scone"             # to FASTAPI_CA_CERT
+# mariadb-related handlebars:
+  - key: "database_host"  # host name of MariaDB certificate
+    value: "mariadb"
+# memcached-related handlebars:
+  - key: "memcached_host"   # nginx host name
+    value: "secure-doc-management-memcached-scone"
+# nginx-related handlebars:
+  - key: "nginx_server_name"   # nginx host name
+    value: "secure-doc-management-nginx-scone"
+  - key: "nginx_backend_server_name"   # nginx host name
+    value: "secure-doc-management-fastapi-scone"
+  - key: "nginx_backend_server_port"   # nginx host name
+    value: "8000"
+  - key: "nginx_initContainers_enabled"   # nginx host name
+    value: "true"
+  - key: "nginx_server_name"   # nginx host name
+    value: "secure-doc-management-nginx-scone"
+  - key: "NGINX_BACKEND_CLIENT_CERT" # map nginx secret NGINX_BACKEND_CLIENT_CERT   
+    value: "FASTAPI_CLIENT_CERT"     # to FASTAPI_CLIENT_CERT
+  - key: "NGINX_BACKEND_CA_CERT"     # map nginx backend NGINX_BACKEND_CA_CERT   
+    value: "FASTAPI_CA_CERT"         # to FASTAPI_CA_CERT
+
+services:
+  - name: memcached
+    image: registry.scontain.com:5050/cicd/memcached:latest
+  - name: nginx
+    image: registry.scontain.com:5050/cicd/nginx:latest
+  - name: maria_db
+    image: registry.scontain.com:5050/cicd/mariadb:latest
+  - name: fastapi
+    image: registry.scontain.com:5050/cicd/secure_document_app

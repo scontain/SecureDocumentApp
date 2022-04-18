@@ -1,0 +1,23 @@
+apiVersion: scone/5.8
+kind: genAppImage
+
+# define some key/value pairs used in handlebars   
+env:
+  - key: "SCONE_HEAP"  # host name of MariaDB certificate
+    value: "512M"
+  - key: "SCONE_LOG" 
+    value: "debug"
+
+build:
+  from: registry.scontain.com:5050/cicd/python
+  to: registry.scontain.com:5050/cicd/secure_document_app
+  copy:
+    - rest_apy.py
+    - requirements.txt
+  run:
+    - "pip3 install -r requirements.txt"
+  binarfs:  # includes the defaults form the base image
+      include-new: # include
+        - /usr/lib
+  gen_policy:
+      policy: fastapi  # generate a local policy ; {{namespace}}/fastapi_{{mode}}

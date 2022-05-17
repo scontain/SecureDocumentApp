@@ -1,23 +1,126 @@
 apiVersion: scone/5.8
-kind: genAppImage
+kind: genservice
 
-# define some key/value pairs used in handlebars   
-env:
-  - key: "SCONE_HEAP"  # host name of MariaDB certificate
-    value: "512M"
-  - key: "SCONE_LOG" 
-    value: "debug"
+# define environment variables
+#  - local ones are only visible for this service - typically, we use SCREAMING_SNAKE_CASE
+#    - local environment variables containing "SCONE" (like SCONE_HEAP) are used when signing the image
+#  - global ones must be defined in the Meshfile (or by some other services, we use snake_case)
+#
+# Value Types:
+#   - constant: defined and cannot change (e.g., "debug")
+#   - mesh time: defined when the services is connected with other services (e.g., {{database_host}})
+#   - run time: defined by SCONE CAS, e.g., $$SCONE::fastapi.crt$$
+
+environment:
+  local:
+    - name: SCONE_ALLOW_DLOPEN
+      value: 1
+    - name: SCONE_LOG  # automatically added to image
+      value: debug
+    - name: SCONE_HEAP # automatically added to image
+      value: 600M
+    - name: DB_HOST
+      value: "{{database_host}}"  # we get this from Meshfile variable database_host
+    - name: DB_USER
+      value: "{{database_user}}"  # we get this from Meshfile variable database_user
+    - name: MC_HOST
+      value: "{{memcached_host}}" # we get this from Meshfile variable memcached_host
+    - name: PYTHONHOME
+      value: "/usr"
+  global: # must be defined in Meshfile!
+    - name: database_host  # ensure that Meshfile defines database_host
+    - name: database_user  # ensure that Meshfile defines database_user
+    - name: memcached_host # ensure that Meshfile defines memcached_host
+    - name: fastapi_host   # we need to define fastapi host
+    - name: CLUSTER_DNS_IP # we need to know the cluster IP
+    - name: K8sNAMESPACE   # we need to know the Kubernetes namespace in which we run (for DNS service)
+
+#
+# We can make configuration parameters visible to applications via injected files
+#
+
+injection_files:
+  - path: /etc/fastapi-ca.crt
+    content: $$SCONE::FASTAPI_CA_CERT.chain$$
+  - path: /etc/server.crt
+    content: $$SCONE::fastapi.crt$$
+  - path: /etc/server.key
+    content: $$SCONE::fastapi.key$$
+  - path: /etc/client.crt
+    content: $$SCONE::FASTAPI_CLIENT_CERT.crt$$ # export client certificate
+  - path: /etc/client.key
+    content: $$SCONE::FASTAPI_CLIENT_CERT.key$$ # export client key
+  - path: /etc/mariadb-ca.crt
+    content: $$SCONE::MARIADB_CA_CERT.chain$$ # Use the database session's CA certificate as a trusted root CA cert. We can use chain here because we verify the session name in the DB
+  - path: /etc/mariadb-client.crt
+    content: $$SCONE::MARIADB_CLIENT_CERT.crt$$
+  - path: /etc/mariadb-client.key
+    content: $$SCONE::MARIADB_CLIENT_CERT.key$$
+  - path: /etc/memcached-ca.crt
+    content: $$SCONE::MEMCACHED_CA_CERT.chain$$ 
+  - path: /etc/memcached-client.crt
+    content: $$SCONE::MEMCACHED_CLIENT_CERT.crt$$
+  - path: /etc/memcached-client.key
+    content: $$SCONE::MEMCACHED_CLIENT_CERT.key$$
+  # Network files
+  - path: /etc/resolv.conf
+    content: |
+      nameserver {{CLUSTER_DNS_IP}}
+      search {{K8sNAMESPACE}}.svc.cluster.local svc.cluster.local cluster.local
+      options ndots:5
+  - path: /etc/hosts
+    content: |
+      # Kubernetes-managed hosts file.
+      127.0.0.1   localhost
+      ::1 localhost ip6-localhost ip6-loopback
+      fe00::0     ip6-localnet
+      fe00::0     ip6-mcastprefix
+      fe00::1     ip6-allnodes
+      fe00::2     ip6-allrouters
+  - path: /etc/hostname
+    content: |
+      {{fastapi_host}}
+
+#
+# run-time secrets (handled by SCONE CAS)
+#
+
+secrets:
+  import:
+    - MEMCACHED_CA_CERT
+    - MEMCACHED_CLIENT_CERT
+    - MARIADB_CA_CERT
+    - MARIADB_CLIENT_CERT
+  global:
+    - name: fastapi-key # automatically generate FASTAPI server certificate
+      kind: private-key
+    - name: fastapi # automatically generate FASTAPI server certificate
+      private_key: fastapi-key
+      issuer: FASTAPI_CA_CERT
+      kind: x509
+      dns:
+        - "{{fastapi_host}}"
+    - name: FASTAPI_CLIENT_KEY
+      kind: private-key
+    - name: FASTAPI_CLIENT_CERT # automatically generate client certificate
+      private_key: FASTAPI_CLIENT_KEY
+      issuer: FASTAPI_CA_CERT
+      common_name: FASTAPI_CLIENT_CERT
+      kind: x509
+    - name: FASTAPI_CA_KEY # export session CA certificate as FASTAPI CA certificate
+      kind: private-key
+    - name: FASTAPI_CA_CERT # export session CA certificate as FASTAPI CA certificate
+      kind: x509-ca
+      common_name: FASTAPI_CA
+      private_key: FASTAPI_CA_KEY
+
 
 build:
-  from: registry.scontain.com:5050/cicd/python
+  name: fastapi-scone
+  kind: python
   to: registry.scontain.com:5050/cicd/secure_document_app
   copy:
-    - rest_apy.py
-    - requirements.txt
-  run:
-    - "pip3 install -r requirements.txt"
-  binarfs:  # includes the defaults form the base image
-      include-new: # include
-        - /usr/lib
-  gen_policy:
-      policy: fastapi  # generate a local policy ; {{namespace}}/fastapi_{{mode}}
+    - fastapi-code/rest_api.py
+  requirements: fastapi-code/requirements.txt
+  pwd: /python
+  command: python3 fastapi-code/rest_api.py

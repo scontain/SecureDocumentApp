@@ -7,25 +7,28 @@ This application demo is a confidential document web application. This service e
 - a **memcached** service, serving as a rate limiter for the application, and
 - an **nginx** instance serves as a proxy server for the application, ensuring termination and forwarding with TLS.
 
+![scone mesh](architecture.png)
+
 All of these components run securely inside of enclaves using the SCONE framework. These services are also integrity protected, and attest each other transparently using TLS in conjunction with a SCONE Configuration and Attestation Service (CAS). Furthermore, the application protects the confidentiality and integrity of all data it receives. We deploy this application using `helm`.
 
-## Running the Application
+## Building und Running the Application
 
 ![scone mesh](scone_gen_app_image.png)
 
 You can get this program to run in 4 steps:
 
 ```bash
-# build the application by building images and using custom images 
-scone apply -f FastApi.yml   # generates a custom FastAPI image
-scone apply -f Meshfile.yml  # generates and uploads the policies and writes the helm charts
-
-# deploy the application
-kubectl create namespace SecureDocuments # ensure that we have the right name
-helm install --namespace SecureDocuments secure-doc-management # use helm chart to install
+sconectl apply -f FastApi.yml   # generates a custom FastAPI container image
+sconectl apply -f Meshfile.yml  # generates/uploads the policies and helm charts
 ```
 
-![scone mesh](scone_apply.png)
+## Deploying the application 
+
+The application can be deployed with help as follows:
+
+```bash
+helm install secure-doc-management target/helm
+```
 
 We put these steps in script `run.sh`, i.e., you could also just execute `run.sh`.
 

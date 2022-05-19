@@ -1,0 +1,4 @@
+pymysql
+uvicorn
+fastapi
+pymemcache

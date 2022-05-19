@@ -9,7 +9,7 @@ cas:
     tolerance: "--only_for_testing-trust-any --only_for_testing-debug  --only_for_testing-ignore-signer -C -G -S"
 
 policy:
-  namespace: "SecureDocManagement"
+  namespace: "SecureDocManagement9"
 #  attestation_policy_name: security/policies/attestation # using CAS instance "attestation"
 #  access_policy_name: security/policies/access      # using CAS instance  "access"
 #  security_policy_name: security/policies/security  # using CAS instance "security"
@@ -26,17 +26,21 @@ env:
 # mariadb-related handlebars:
   - name: "database_host"  # host name of MariaDB certificate
     value: "secure-doc-management-mariadb-scone"      # overwrite default
+  - name: "database_port"  # host name of MariaDB certificate
+    value: "3306"      # overwrite default
 # memcached-related handlebars:
   - name: "memcached_host"   # nginx host name
     value: "secure-doc-management-memcached-scone" # overwrite default
+  - name: "memcached_port"   # nginx port
+    value: "11211" 
 # nginx-related handlebars:
   - name: "nginx_server_name"   # nginx host name
     value: "secure-doc-management-nginx-scone"
   - name: "nginx_backend_server_name"   # nginx host name
-    value: "secure-doc-management-fastapi"
+    value: "secure-doc-management-fastapi-scone"
   - name: "nginx_backend_server_port"   # nginx host name
     value: "8000"
-  - name: "nginx_initContainers_enabled"   # nginx host name
+  - name: "nginx_initContainers_enabled"  # nginx host name
     value: "true"
 # FASTAPI / nginx
   - name: "NGINX_BACKEND_CLIENT_CERT" # map nginx secret NGINX_BACKEND_CLIENT_CERT   
@@ -45,7 +49,7 @@ env:
     value: "FASTAPI_CA_CERT"         # to FASTAPI_CA_CERT
 # FASTAPI
   - name: fastapi_host
-    value: "secure-doc-management-fastapi"
+    value: "secure-doc-management-fastapi-scone"
   - name: CLUSTER_DNS_IP
     value: "10.96.0.10"
   - name: K8sNAMESPACE
@@ -62,5 +66,5 @@ services:
     image: registry.scontain.com:5050/cicd/nginx:latest
   - name: maria_db
     image: registry.scontain.com:5050/cicd/mariadb:latest
-  - name: fastapi
+  - name: fastapi-scone
     image: registry.scontain.com:5050/cicd/secure_document_app

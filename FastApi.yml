@@ -27,6 +27,20 @@ environment:
       value: "{{memcached_host}}" # we get this from Meshfile variable memcached_host
     - name: PYTHONHOME
       value: "/usr"
+    - name: INIT_CONTAINER1_ENABLE
+      value: "true"
+    - name: INIT_CONTAINER1
+      value: "{{database_host}}"
+    - name: INIT_CONTAINER1_PORT
+      value: "{{database_port}}"
+    - name: INIT_CONTAINER2_ENABLE
+      value: "true"
+    - name: INIT_CONTAINER2
+      value: "{{memcached_host}}"
+    - name: INIT_CONTAINER2_PORT
+      value: "{{memcached_port}}"
+    - name: PYTHON_SERVICE_PORT
+      value: "{{nginx_backend_server_port}}"
   global: # must be defined in Meshfile!
     - name: database_host  # ensure that Meshfile defines database_host
     - name: database_user  # ensure that Meshfile defines database_user

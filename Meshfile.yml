@@ -9,12 +9,10 @@ cas:
     tolerance: "--only_for_testing-trust-any --only_for_testing-debug  --only_for_testing-ignore-signer -C -G -S"
 
 policy:
-  namespace: "SecureDocManagement9"
-#  attestation_policy_name: security/policies/attestation # using CAS instance "attestation"
-#  access_policy_name: security/policies/access      # using CAS instance  "access"
-#  security_policy_name: security/policies/security  # using CAS instance "security"
+  namespace: "SecureDocManagement10"
 
-# define some key/value pairs used in handlebars   
+# define some key/value pairs used in handlebars 
+# NOTE: Syntax will change to be look like a helm values file!
 env:
 # helm related definitions:
   - name: "session_secrets" 

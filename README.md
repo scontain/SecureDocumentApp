@@ -32,6 +32,32 @@ helm install secure-doc-management target/helm
 
 We put these steps in script `run.sh`, i.e., you could also just execute `run.sh`.
 
+If you want to enable persistence for MariaDB, create volume claims as follows:
+
+```bash
+# The volume claims use the nfs-client storage class.
+# If you want to use a different one, running on azure for example,
+# change the storage class before applying the volume claims. 
+kubectl apply -f volume-claims/maria-pvc.yml
+```
+
+Then, after creating the volume claims, deploy the application with the following:
+
+```bash
+helm install secure-doc-management target/helm \
+    --set mariadb-scone.persistence.enabled=true \
+    --set mariadb-scone.persistence.existingClaim=maria-data-pvc \
+    --set mariadb-scone.persistence.size=1Gi \
+    --set mariadb-scone.extraVolumes\[0\].name=external \
+    --set mariadb-scone.extraVolumes\[0\].persistentVolumeClaim.claimName=maria-external-pvc \
+    --set mariadb-scone.extraVolumes\[1\].name=vartmp \
+    --set mariadb-scone.extraVolumes\[1\].persistentVolumeClaim.claimName=maria-vartmp-pvc \
+    --set mariadb-scone.extraVolumeMounts\[0\].name=external \
+    --set mariadb-scone.extraVolumeMounts\[0\].mountPath=/external \
+    --set mariadb-scone.extraVolumeMounts\[1\].name=vartmp \
+    --set mariadb-scone.extraVolumeMounts\[1\].mountPath=/var/tmp
+```
+
 ## Running the Client
 
 ..to do...

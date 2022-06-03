@@ -44,7 +44,10 @@ environment:
   global: # must be defined in Meshfile!
     - name: database_host  # ensure that Meshfile defines database_host
     - name: database_user  # ensure that Meshfile defines database_user
+    - name: database_port  # ensure that we define this port
     - name: memcached_host # ensure that Meshfile defines memcached_host
+    - name: memcached_port # ensure that Meshfile defines memcached_port
+    - name: nginx_backend_server_port # ensure that Meshfile defines nginx_backend_server_port
     - name: fastapi_host   # we need to define fastapi host
     - name: CLUSTER_DNS_IP # we need to know the cluster IP
     - name: K8sNAMESPACE   # we need to know the Kubernetes namespace in which we run (for DNS service)

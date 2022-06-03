@@ -55,7 +55,7 @@ env:
   - name: database_user
     value: "scontain"
   - name: APP_SERVICE_PORT
-    value: "443"
+    value: "443"  # fix this
 
 services:
   - name: memcached
@@ -66,3 +66,16 @@ services:
     image: registry.scontain.com:5050/cicd/mariadb:latest
   - name: fastapi-scone
     image: registry.scontain.com:5050/cicd/secure_document_app
+
+helm:
+ - "mariadb-scone.persistence.enabled=true"
+ - "mariadb-scone.persistence.existingClaim=maria-data-pvc"
+ - "mariadb-scone.persistence.size=1Gi"
+ - "mariadb-scone.extraVolumes[0].name=external"
+ - "mariadb-scone.extraVolumes[0].persistentVolumeClaim.claimName=maria-external-pvc"
+ - "mariadb-scone.extraVolumes[1].name=vartmp"
+ - "mariadb-scone.extraVolumes[1].persistentVolumeClaim.claimName=maria-vartmp-pvc"
+ - "mariadb-scone.extraVolumeMounts[0].name=external"
+ - "mariadb-scone.extraVolumeMounts[0].mountPath=/external"
+ - "mariadb-scone.extraVolumeMounts[1].name=vartmp"
+ - "mariadb-scone.extraVolumeMounts[1].mountPath=/var/tmp"

@@ -18,8 +18,8 @@ All of these components run securely inside of enclaves using the SCONE framewor
 You can get this program to run in 4 steps:
 
 ```bash
-sconectl apply -f FastApi.yml   # generates a custom FastAPI container image
-sconectl apply -f Meshfile.yml  # generates/uploads the policies and helm charts
+sconectl apply -f service.yml   # generates a custom FastAPI container image
+sconectl apply -f mesh.yml  # generates/uploads the policies and helm charts
 ```
 
 ## Deploying the application 
@@ -32,6 +32,3 @@ helm install secure-doc-management target/helm
 
 We put these steps in script `run.sh`, i.e., you could also just execute `run.sh`.
 
-## Running the Client
-
-..to do...

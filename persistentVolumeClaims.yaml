@@ -1,0 +1,48 @@
+# Persistent volume claims used to keep MariaDB data.
+# The data is protected by SCONE transparent encryption
+# and the keys are managed by SCONE CAS.
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: maria-data-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  # If not using the default storage class,
+  # CUSTOM_STORAGE_CLASS is replaced by
+  # setup.sh
+#  storageClassName: $CUSTOM_STORAGE_CLASS
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: maria-external-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  # If not using the default storage class,
+  # CUSTOM_STORAGE_CLASS is replaced by
+  # setup.sh
+#  storageClassName: $CUSTOM_STORAGE_CLASS
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: maria-vartmp-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  # If not using the default storage class,
+  # CUSTOM_STORAGE_CLASS is replaced by
+  # setup.sh
+#  storageClassName: $CUSTOM_STORAGE_CLASS
+  resources:
+    requests:
+      storage: 1Gi

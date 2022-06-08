@@ -15,9 +15,12 @@ All of these components run securely inside of enclaves using the SCONE framewor
 
 ![scone mesh](scone_gen_app_image.png)
 
-You can get this program to run in 4 steps:
+You can get this program to run with the following steps steps:
 
 ```bash
+./setup.sh # uses persistentVolumeClaims.yaml to create volume claims for MariaDB with the default storage class
+# if you want to use a custom storage class, do
+# ./setup.sh --custom-storage-class <storage-class-name>
 sconectl apply -f service.yml   # generates a custom FastAPI container image
 sconectl apply -f mesh.yml  # generates/uploads the policies and helm charts
 ```
@@ -30,5 +33,18 @@ The application can be deployed with help as follows:
 helm install secure-doc-management target/helm
 ```
 
-We put these steps in script `run.sh`, i.e., you could also just execute `run.sh`.
+We put the sconectl and helm steps in script `run.sh`, i.e., you could also just execute `setup.sh` and `run.sh`.
 
+## Cleaning up resources
+
+You can uninstall the application with the following HELM command:
+
+```bash
+helm uninstall secure-doc-management
+```
+
+Also, to clean up the volumes created, `kubectl` can be used:
+
+```bash
+kubectl delete -f persistentVolumeClaims.yaml
+```

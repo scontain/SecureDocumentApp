@@ -1,0 +1,75 @@
+apiVersion: scone/5.8
+kind: genservice
+
+# Client service definition (genservice)
+
+# define environment variables
+#  - local ones are only visible for this service - typically, we use SCREAMING_SNAKE_CASE
+#    - local environment variables containing "SCONE" (like SCONE_HEAP) are used when signing the image
+#  - global ones must be defined in the Meshfile (or by some other services, we use snake_case)
+#
+# Value Types:
+#   - constant: defined and cannot change (e.g., "debug")
+#   - mesh time: defined when the services is connected with other services (e.g., {{database_host}})
+#   - run time: defined by SCONE CAS, e.g., $$SCONE::fastapi.crt$$
+
+environment:
+  local:
+    - name: SCONE_ALLOW_DLOPEN
+      value: 1
+    - name: SCONE_LOG  # automatically added to image
+      value: info
+    - name: SCONE_HEAP # automatically added to image
+      value: 600M
+    - name: PYTHONHOME
+      value: "/usr"
+    - name: REQUESTS_CA_BUNDLE # python requests will use this env var
+      value: "/etc/nginx_ca.crt"
+    - name: NGINX_ADDR
+      value: "{{nginx_server_name}}"
+  global: # must be defined in Meshfile!
+    - name: CLUSTER_DNS_IP # we need to know the cluster IP
+    - name: K8sNAMESPACE   # we need to know the Kubernetes namespace in which we run (for DNS service)
+
+#
+# We can make configuration parameters visible to applications via injected files
+#
+
+injection_files:
+  # todo: ensure this cert is available
+  - path: /etc/nginx_ca.crt
+    content: $$SCONE::NGINX_SERVER_CA_CERT.chain$$
+  # Network files
+  - path: /etc/resolv.conf
+    content: |
+      nameserver {{CLUSTER_DNS_IP}}
+      search {{K8sNAMESPACE}}.svc.cluster.local svc.cluster.local cluster.local
+      options ndots:5
+  - path: /etc/hosts
+    content: |
+      # Kubernetes-managed hosts file.
+      127.0.0.1   localhost
+      ::1 localhost ip6-localhost ip6-loopback
+      fe00::0     ip6-localnet
+      fe00::0     ip6-mcastprefix
+      fe00::1     ip6-allnodes
+      fe00::2     ip6-allrouters
+
+#
+# run-time secrets (handled by SCONE CAS)
+#
+
+secrets:
+  import:
+    - NGINX_SERVER_CA_CERT
+
+
+build:
+  name: fastapi-client-scone
+  kind: python
+  to: registry.scontain.com:5050/cicd/secure_document_app_client
+  copy:
+    - client-code/client.py
+  requirements: client-code/requirements.txt
+  pwd: /python
+  command: python3 client-code/client.py

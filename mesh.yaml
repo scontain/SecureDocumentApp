@@ -66,6 +66,8 @@ services:
     image: registry.scontain.com:5050/cicd/mariadb:latest
   - name: fastapi-scone
     image: registry.scontain.com:5050/cicd/secure_document_app
+  - name: client
+    image: registry.scontain.com:5050/cicd/secure_document_app_client
 
 helm_extra_values:
   mariadb-scone:

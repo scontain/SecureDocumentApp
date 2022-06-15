@@ -16,7 +16,7 @@ environment:
     - name: SCONE_ALLOW_DLOPEN
       value: 1
     - name: SCONE_LOG  # automatically added to image
-      value: debug
+      value: info
     - name: SCONE_HEAP # automatically added to image
       value: 600M
     - name: DB_HOST
@@ -74,7 +74,7 @@ injection_files:
   - path: /etc/mariadb-client.key
     content: $$SCONE::MARIADB_CLIENT_CERT.key$$
   - path: /etc/memcached-ca.crt
-    content: $$SCONE::MEMCACHED_CA_CERT.chain$$ 
+    content: $$SCONE::MEMCACHED_CA_CERT.chain$$
   - path: /etc/memcached-client.crt
     content: $$SCONE::MEMCACHED_CLIENT_CERT.crt$$
   - path: /etc/memcached-client.key

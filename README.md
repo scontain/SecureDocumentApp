@@ -21,6 +21,7 @@ You can get this program to run with the following steps steps:
 ./setup.sh # uses persistentVolumeClaims.yaml to create volume claims for MariaDB with the default storage class
 # if you want to use a custom storage class, do
 # ./setup.sh --custom-storage-class <storage-class-name>
+sconectl apply -f clientService.yaml # generates a custom FastAPI client container image
 sconectl apply -f service.yaml   # generates a custom FastAPI container image
 sconectl apply -f mesh.yaml  # generates/uploads the policies and helm charts
 ```

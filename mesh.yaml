@@ -5,11 +5,11 @@ cas:
   - name: cas # cas used to store the policy of this application
     alias: ["image", "security", "access", "attestation"] # use alias in case CAS instance has multiple roles
     cas_url: edge.scone-cas.cf  # exported as {{cas_cas_cas_url}}
-    cas_key: 3zjws9vn6CHNNeHQdHVAsbf5nMJegeKNEAwQAWbhhoK65PHp8G # define explicit cas_key
+    cas_key: 492z2U8P9oZ9kUGZgM9UNMZxdDuN17QoLG484VXs3scTCY8oU2 # define explicit cas_key
     tolerance: "--only_for_testing-trust-any --only_for_testing-debug  --only_for_testing-ignore-signer -C -G -S"
 
 policy:
-  namespace: "SecureDocManagement15"
+  namespace: "SecureDocManagement16"
 
 # define some key/value pairs used in handlebars 
 # NOTE: Syntax will change to be look like a helm values file!

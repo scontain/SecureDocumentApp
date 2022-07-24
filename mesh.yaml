@@ -8,53 +8,62 @@ cas:
     tolerance: "--only_for_testing-trust-any --only_for_testing-debug  --only_for_testing-ignore-signer -C -G -S"
 
 policy:
-  namespace: "SecureDocManagement21"
+  namespace: "SecureDocManagement22"
 
-# define some key/value pairs used in handlebars 
-# NOTE: Syntax will change to be look like a helm values file!
+# define environment variables
+# - this is can be done for each individual service defined in the services section 
+#   - these definitions are only visible for this service
+#   - these definitions overwrite any definitions of the global or helm section 
+# - we define two special services:
+#   - "global": these definitions are shared by all services
+#   - "helm": this behaves like the "global" service - the intention is to
+#             collect helm specific definitions here
+
 env:
-# helm related definitions:
-  - name: "session_secrets" 
-    value: "../secrets"
-  - name: "imagePullSecrets"    # kubernetes image pull secret
-    value: "sconeapps"         # to FASTAPI_CA_CERT
-  - name: "useSGXDevPlugin"     # kubernetes image pull secret
-    value: "scone"             # to FASTAPI_CA_CERT
-# mariadb-related handlebars:
-  - name: "database_host"  # host name of MariaDB certificate
-    value: "secure-doc-management-mariadb-scone"      # overwrite default
-  - name: "database_port"  # host name of MariaDB certificate
-    value: "3306"      # overwrite default
-# memcached-related handlebars:
-  - name: "memcached_host"   # nginx host name
-    value: "secure-doc-management-memcached-scone" # overwrite default
-  - name: "memcached_port"   # nginx port
-    value: "11211" 
-# nginx-related handlebars:
-  - name: "nginx_server_name"   # nginx host name
-    value: "secure-doc-management-nginx-scone"
-  - name: "nginx_backend_server_name"   # nginx host name
-    value: "secure-doc-management-fastapi-scone"
-  - name: "nginx_backend_server_port"   # nginx host name
-    value: "8000"
-  - name: "nginx_initContainers_enabled"  # nginx host name
-    value: "true"
-# FASTAPI / nginx
-  - name: "NGINX_BACKEND_CLIENT_CERT" # map nginx secret NGINX_BACKEND_CLIENT_CERT   
-    value: "FASTAPI_CLIENT_CERT"     # to FASTAPI_CLIENT_CERT
-  - name: "NGINX_BACKEND_CA_CERT"     # map nginx backend NGINX_BACKEND_CA_CERT   
-    value: "FASTAPI_CA_CERT"         # to FASTAPI_CA_CERT
-# FASTAPI
-  - name: fastapi_host
-    value: "secure-doc-management-fastapi-scone"
-  - name: CLUSTER_DNS_IP
-    value: "10.96.0.10"
-  - name: K8sNAMESPACE
-    value: "default"
-  - name: database_user
-    value: "scontain"
-  - name: APP_SERVICE_PORT
-    value: "443"  # fix this
+  - service: global
+    env:
+  # helm related definitions:
+    - name: "session_secrets" 
+      value: "../secrets"
+    - name: "imagePullSecrets"    # kubernetes image pull secret
+      value: "sconeapps"         # to FASTAPI_CA_CERT
+    - name: "useSGXDevPlugin"     # kubernetes image pull secret
+      value: "scone"             # to FASTAPI_CA_CERT
+  # mariadb-related handlebars:
+    - name: "database_host"  # host name of MariaDB certificate
+      value: "secure-doc-management-mariadb-scone"      # overwrite default
+    - name: "database_port"  # host name of MariaDB certificate
+      value: "3306"      # overwrite default
+  # memcached-related handlebars:
+    - name: "memcached_host"   # nginx host name
+      value: "secure-doc-management-memcached-scone" # overwrite default
+    - name: "memcached_port"   # nginx port
+      value: "11211" 
+  # nginx-related handlebars:
+    - name: "nginx_server_name"   # nginx host name
+      value: "secure-doc-management-nginx-scone"
+    - name: "nginx_backend_server_name"   # nginx host name
+      value: "secure-doc-management-fastapi-scone"
+    - name: "nginx_backend_server_port"   # nginx host name
+      value: "8000"
+    - name: "nginx_initContainers_enabled"  # nginx host name
+      value: "true"
+  # FASTAPI / nginx
+    - name: "NGINX_BACKEND_CLIENT_CERT" # map nginx secret NGINX_BACKEND_CLIENT_CERT   
+      value: "FASTAPI_CLIENT_CERT"     # to FASTAPI_CLIENT_CERT
+    - name: "NGINX_BACKEND_CA_CERT"     # map nginx backend NGINX_BACKEND_CA_CERT   
+      value: "FASTAPI_CA_CERT"         # to FASTAPI_CA_CERT
+  # FASTAPI
+    - name: fastapi_host
+      value: "secure-doc-management-fastapi-scone"
+    - name: CLUSTER_DNS_IP
+      value: "10.96.0.10"
+    - name: K8sNAMESPACE
+      value: "default"
+    - name: database_user
+      value: "scontain"
+    - name: APP_SERVICE_PORT
+      value: "443"
 
 services:
   - name: memcached

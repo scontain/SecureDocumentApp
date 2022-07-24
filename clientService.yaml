@@ -30,6 +30,7 @@ environment:
   global: # must be defined in Meshfile!
     - name: CLUSTER_DNS_IP # we need to know the cluster IP
     - name: K8sNAMESPACE   # we need to know the Kubernetes namespace in which we run (for DNS service)
+    - name: nginx_server_name
 
 #
 # We can make configuration parameters visible to applications via injected files

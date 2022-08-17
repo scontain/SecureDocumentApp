@@ -67,15 +67,15 @@ env:
 
 services:
   - name: memcached
-    image: registry.scontain.com:5050/cicd/memcached:latest
+    image: registry.scontain.com:5050/sconectl/memcached:latest
   - name: nginx
-    image: registry.scontain.com:5050/cicd/nginx:latest
+    image: registry.scontain.com:5050/sconectl/nginx:latest
   - name: maria_db
-    image: registry.scontain.com:5050/cicd/mariadb:latest
+    image: registry.scontain.com:5050/sconectl/mariadb:latest
   - name: fastapi-scone
-    image: registry.scontain.com:5050/cicd/secure_document_app
+    image: registry.scontain.com:5050/sconectl/secure_document_app
   - name: client
-    image: registry.scontain.com:5050/cicd/secure_document_app_client
+    image: registry.scontain.com:5050/sconectl/secure_document_app_client
 
 helm_extra_values:
   mariadb-scone:

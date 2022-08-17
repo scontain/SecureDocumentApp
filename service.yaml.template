@@ -135,7 +135,7 @@ secrets:
 build:
   name: fastapi-scone
   kind: python
-  to: registry.scontain.com:5050/cicd/secure_document_app
+  to: $APP_IMAGE_REPO/secure_document_app
   copy:
     - fastapi-code/rest_api.py
   requirements: fastapi-code/requirements.txt

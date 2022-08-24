@@ -1,2 +1,4 @@
 target
 .kube
+mesh.yaml
+service.yaml

@@ -8,7 +8,7 @@ cas:
     tolerance: "--only_for_testing-trust-any --only_for_testing-debug  --only_for_testing-ignore-signer -C -G -S"
 
 policy:
-  namespace: "SecureDocManagement22"
+  namespace: "$APP_NAMESPACE"
 
 # define environment variables
 # - this is can be done for each individual service defined in the services section 
@@ -29,6 +29,8 @@ env:
       value: "sconeapps"         # to FASTAPI_CA_CERT
     - name: "useSGXDevPlugin"     # kubernetes image pull secret
       value: "scone"             # to FASTAPI_CA_CERT
+    - name: sgxEpcMem
+      value: 128
   # mariadb-related handlebars:
     - name: "database_host"  # host name of MariaDB certificate
       value: "secure-doc-management-mariadb-scone"      # overwrite default
@@ -67,15 +69,15 @@ env:
 
 services:
   - name: memcached
-    image: registry.scontain.com:5050/sconectl/memcached:latest
+    image: registry.scontain.com:5050/cicd/memcached:latest
   - name: nginx
-    image: registry.scontain.com:5050/sconectl/nginx:latest
+    image: registry.scontain.com:5050/cicd/nginx:latest
   - name: maria_db
-    image: registry.scontain.com:5050/sconectl/mariadb:latest
+    image: registry.scontain.com:5050/cicd/mariadb:latest
   - name: fastapi-scone
-    image: registry.scontain.com:5050/sconectl/secure_document_app
+    image: registry.scontain.com:5050/cicd/secure_document_app
   - name: client
-    image: registry.scontain.com:5050/sconectl/secure_document_app_client
+    image: registry.scontain.com:5050/cicd/secure_document_app_client
 
 helm_extra_values:
   mariadb-scone:

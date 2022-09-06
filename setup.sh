@@ -25,3 +25,6 @@ else
     echo -e "${BLUE}Applying persistent volume claims:${NC} kubectl apply -f persistentVolumeClaims.yaml"
     kubectl apply -f persistentVolumeClaims.yaml
 fi
+
+echo -e "export RELEASE=\"secure-doc-management\"\n" > release.sh
+

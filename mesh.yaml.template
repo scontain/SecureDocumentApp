@@ -72,7 +72,7 @@ services:
     image: registry.scontain.com:5050/cicd/memcached:latest
   - name: nginx
     image: registry.scontain.com:5050/cicd/nginx:latest
-  - name: maria_db
+  - name: mariadb
     image: registry.scontain.com:5050/cicd/mariadb:latest
   - name: fastapi-scone
     image: registry.scontain.com:5050/cicd/secure_document_app

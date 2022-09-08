@@ -8,7 +8,10 @@ export BLUE='\e[34m'
 export ORANGE='\e[33m'
 export NC='\e[0m' # No Color
 
-source release.sh || true # get release name
+unset APP_NAMESPACE
+
+source release.sh
+rm -f mesh.yaml service.yaml
 
 if [ -z "$APP_NAMESPACE" ] ; then
     export APP_NAMESPACE="$RELEASE-$RANDOM-$RANDOM"

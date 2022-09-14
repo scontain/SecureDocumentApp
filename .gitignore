@@ -2,3 +2,4 @@ target
 .kube
 mesh.yaml
 service.yaml
+mesh_out.yaml

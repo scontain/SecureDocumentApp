@@ -8,10 +8,7 @@ export BLUE='\e[34m'
 export ORANGE='\e[33m'
 export NC='\e[0m' # No Color
 
-unset APP_NAMESPACE
-
-source release.sh
-rm -f mesh.yaml service.yaml
+source release.sh || true # get release name
 
 if [ -z "$APP_NAMESPACE" ] ; then
     export APP_NAMESPACE="$RELEASE-$RANDOM-$RANDOM"
@@ -21,7 +18,8 @@ else
 fi
 
 DEFAULT_NAMESPACE="" # Default Kubernetes namespace to use
-APP_IMAGE_REPO=${APP_IMAGE_REPO:=""} # Must be defined!
+export APP_IMAGE_REPO=${APP_IMAGE_REPO:=""} # Must be defined!
+export SCONECTL_REPO=${SCONECTL_REPO:="registry.scontain.com:5050/sconectl"}
 
 # print an error message on an error exit
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
@@ -37,6 +35,9 @@ verbose=""
 release_flag="--release"
 release_short_flag="-r"
 verbose=""
+debug_flag="--debug"
+debug_short_flag="-d"
+debug=""
 
 ns="$DEFAULT_NAMESPACE"
 repo="$APP_IMAGE_REPO"
@@ -71,8 +72,13 @@ usage ()
   echo "                    export APP_IMAGE_REPO=\"$APP_IMAGE_REPO\""
   echo "    $verbose_flag"
   echo "                  Enable verbose output"
+  echo "    $debug_flag | debug_short_flag"
+  echo "                  Create debug image instead of a production image"
   echo "    $help_flag"
   echo "                  Output this usage information and exit."
+  echo ""
+  echo "By default this uses the latest release of the SCONE Elements images. To use image from a different"
+  echo "repository (e.g., a local cache), set SCONECTL_REPO to the repo you want to use instead."
   return
 }
 
@@ -111,6 +117,10 @@ while [[ "$#" -gt 0 ]]; do
       verbose="-vvvvvvvv"
       shift # past argument
       ;;
+    ${debug_flag} | ${debug_short_flag})
+      debug="--mode=debug"
+      shift # past argument
+      ;;
     $help_flag)
       usage
       exit 0
@@ -133,6 +143,7 @@ if [  "${repo}" == "" ]; then
     error_exit  "Error: You must specify a repo."
 fi
 export APP_IMAGE_REPO="${repo}"
+export RELEASE="$release"
 
 # Check to make sure all prerequisites are installed
 ./check_prerequisites.sh
@@ -155,7 +166,15 @@ echo -e  "${BLUE}   change in file '${ORANGE}service.yaml${BLUE}' field '${ORANG
 
 SCONE="\$SCONE" envsubst < service.yaml.template > service.yaml
 
-sconectl apply -f service.yaml $verbose
+sconectl apply -f service.yaml $verbose $debug
+
+echo -e  "${BLUE}build client  image:${NC} apply -f clientService.yaml"
+echo -e  "${BLUE} - if the push fails, add --no-push to avoid pushing the image, or${NC}"
+echo -e  "${BLUE}   change in file '${ORANGE}service.yaml${BLUE}' field '${ORANGE}build.to${BLUE}' to a container repo to which you have permission to push.${NC}"
+
+SCONE="\$SCONE" envsubst < clientService.yaml.template > clientService.yaml
+
+sconectl apply -f clientService.yaml $verbose $debug
 
 
 echo -e "${BLUE}build application and pushing policies:${NC} apply -f mesh.yaml"
@@ -164,7 +183,7 @@ echo -e "  - update the namespace '${ORANGE}policy.namespace${NC}' to a unique n
 
 SCONE="\$SCONE" envsubst < mesh.yaml.template > mesh.yaml
 
-sconectl apply -f mesh.yaml $verbose
+sconectl apply -f mesh.yaml $verbose $debug
 
 echo -e "${BLUE}Uninstalling application in case it was previously installed:${NC} helm uninstall ${namespace_args} ${RELEASE}"
 echo -e "${BLUE} - this requires that 'kubectl' gives access to a Kubernetes cluster${NC}"

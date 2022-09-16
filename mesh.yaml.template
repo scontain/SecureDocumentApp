@@ -33,17 +33,17 @@ env:
       value: 128
   # mariadb-related handlebars:
     - name: "database_host"  # host name of MariaDB certificate
-      value: "secure-doc-management-mariadb-scone"      # overwrite default
+      value: "secure-doc-management-mariadb"      # overwrite default
     - name: "database_port"  # host name of MariaDB certificate
       value: "3306"      # overwrite default
   # memcached-related handlebars:
     - name: "memcached_host"   # nginx host name
-      value: "secure-doc-management-memcached-scone" # overwrite default
+      value: "secure-doc-management-memcached" # overwrite default
     - name: "memcached_port"   # nginx port
       value: "11211" 
   # nginx-related handlebars:
     - name: "nginx_server_name"   # nginx host name
-      value: "secure-doc-management-nginx-scone"
+      value: "secure-doc-management-nginx"
     - name: "nginx_backend_server_name"   # nginx host name
       value: "secure-doc-management-fastapi-scone"
     - name: "nginx_backend_server_port"   # nginx host name

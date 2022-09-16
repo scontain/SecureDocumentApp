@@ -3,3 +3,4 @@ target
 mesh.yaml
 service.yaml
 mesh_out.yaml
+clientService.yaml

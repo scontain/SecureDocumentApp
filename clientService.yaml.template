@@ -68,7 +68,7 @@ secrets:
 build:
   name: fastapi-client-scone
   kind: python
-  to: registry.scontain.com:5050/cicd/secure_document_app_client
+  to: $APP_IMAGE_REPO/secure_document_app_client
   copy:
     - client-code/client.py
   requirements: client-code/requirements.txt

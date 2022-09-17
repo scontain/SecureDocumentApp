@@ -56,7 +56,7 @@ usage ()
   echo "    run.sh [$ns_flag <kubernetes-namespace>] [$repo_flag <image repo>] [$release_flag <release name>] [$verbose_flag] [$help_flag]"
   echo ""
   echo ""
-  echo "Builds the application described in service.yaml and mesh.yaml and deploys"
+  echo "Builds the application described in service.yaml.template and mesh.yaml.template and deploys"
   echo "it into your kubernetes cluster."
   echo ""
   echo "Options:"
@@ -150,7 +150,7 @@ export RELEASE="$release"
 
 echo -e "${BLUE}Checking that we have access to the base container image${NC}"
 
-docker inspect registry.scontain.com:5050/sconectl/sconecli:latest > /dev/null 2> /dev/null || docker pull registry.scontain.com:5050/sconectl/sconecli:latest > /dev/null 2> /dev/null || { 
+docker inspect $SCONECTL_REPO/sconecli:latest > /dev/null 2> /dev/null || docker pull $SCONECTL_REPO/sconecli:latest > /dev/null 2> /dev/null || { 
     echo -e "${RED}You must get access to image `sconectl/sconecli:latest`.${NC}" 
     error_exit "Please send email info@scontain.com to ask for access"
 }
@@ -168,6 +168,7 @@ SCONE="\$SCONE" envsubst < service.yaml.template > service.yaml
 
 sconectl apply -f service.yaml $verbose $debug
 
+
 echo -e  "${BLUE}build client  image:${NC} apply -f clientService.yaml"
 echo -e  "${BLUE} - if the push fails, add --no-push to avoid pushing the image, or${NC}"
 echo -e  "${BLUE}   change in file '${ORANGE}service.yaml${BLUE}' field '${ORANGE}build.to${BLUE}' to a container repo to which you have permission to push.${NC}"
@@ -176,14 +177,13 @@ SCONE="\$SCONE" envsubst < clientService.yaml.template > clientService.yaml
 
 sconectl apply -f clientService.yaml $verbose $debug
 
-
 echo -e "${BLUE}build application and pushing policies:${NC} apply -f mesh.yaml"
 echo -e "${BLUE}  - this fails, if you do not have access to the SCONE CAS namespace"
 echo -e "  - update the namespace '${ORANGE}policy.namespace${NC}' to a unique name in '${ORANGE}mesh.yaml${NC}'"
 
 SCONE="\$SCONE" envsubst < mesh.yaml.template > mesh.yaml
 
-sconectl apply -f mesh.yaml $verbose $debug
+sconectl apply -f mesh.yaml --release "$RELEASE" $verbose $debug
 
 echo -e "${BLUE}Uninstalling application in case it was previously installed:${NC} helm uninstall ${namespace_args} ${RELEASE}"
 echo -e "${BLUE} - this requires that 'kubectl' gives access to a Kubernetes cluster${NC}"

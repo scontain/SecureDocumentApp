@@ -1,4 +1,2 @@
-export RELEASE="secure-doc-management"
-
-export APP_NAMESPACE=secure-doc-management-30548-15131
+export APP_NAMESPACE=secure-document-12351-28432
 

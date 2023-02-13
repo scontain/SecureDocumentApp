@@ -35,6 +35,8 @@ env:
       value: "scone"             # to FASTAPI_CA_CERT
     - name: sgxEpcMem
       value: 128
+    - name: SCONE_VERSION
+      value: 1
   # mariadb-related handlebars:
     - name: "database_host"  # host name of MariaDB certificate
       value: "${RELEASE}-mariadb"      # overwrite default
@@ -79,9 +81,9 @@ services:
   - name: mariadb
     image: $SCONECTL_REPO/mariadb:latest
   - name: fastapi-scone
-    image: $SCONECTL_REPO/secure_document_app
+    image: $APP_IMAGE_REPO/secure_document_app
   - name: client
-    image: $SCONECTL_REPO/secure_document_app_client
+    image: $APP_IMAGE_REPO/secure_document_app_client
 
 helm_extra_values:
   mariadb-scone:

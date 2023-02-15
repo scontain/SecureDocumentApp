@@ -11,13 +11,43 @@ This application demo is a confidential document web application. This service e
 
 All of these components run securely inside of enclaves using the SCONE framework. These services are also integrity protected, and attest each other transparently using TLS in conjunction with a SCONE Configuration and Attestation Service (CAS). Furthermore, the application protects the confidentiality and integrity of all data it receives. We deploy this application using `helm`.
 
-## Building und Running the Application
+## Building and running the application
 
 No time to read all the steps? We put the sconectl and helm steps in script `run.sh`. Just execute `./run.sh` and have a happy sconification!
 
 ![scone mesh](scone_gen_app_image.png)
 
 You can get this program to run with the following steps.
+
+### Installing SCONE operator, its dependencies, and CAS
+
+If you have a clean K8s cluster, you need to install the SCONE operator. CAS is also needed for attesting the SecureDocumentApp components. To install everything, assuming you are in the `default` k8s namespace, do:
+
+1. Install operator, LAS, and SGXPlugin
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/scontain/SH/master/5.8.0-rc.4/operator_controller | LAS_MANIFEST=https://raw.githubusercontent.com/scontain/manifests/main/5.8.0-rc.4/las-azure.yaml bash -s - --set-version 5.8.0-rc.4 --plugin --reconcile --update --secret-operator --verbose --username $REGISTRY_USERNAME --access-token $REGISTRY_ACCESS_TOKEN  --email $REGISTRY_EMAIL
+```
+
+2. `operator_controller` will create the `scone-system` namespace. Check the pods in `scone-system` with
+
+```bash
+kubectl get pods -n scone-system
+```
+
+3. Once everything in `scone-system` is running and ready (check output of previous command), we can install CAS and provision using the `kubectl-provision` script.
+
+```bash
+curl -fsSL  https://raw.githubusercontent.com/scontain/SH/master/5.8.0-rc.4/kubectl-provision | bash -s - cas cas --set-version 5.8.0-rc.4 --verbose
+```
+
+4. Check that CAS is HEALTHY before you continue to next steps.
+
+```bash
+kubectl get cas.services.scone.cloud cas
+```
+
+Once CAS is HEALTHY, you're ready to go.
 
 ### Make sure that your local machine meet all requirements
 

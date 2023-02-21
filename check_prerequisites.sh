@@ -84,7 +84,6 @@ then
 fi
 
 echo -e "${BLUE}Checking that we the CPU has all necessary CPU features enabled${NC}"
-if ! docker run --platform linux/amd64 --rm $SCONECTL_REPO/check_cpufeatures:latest &> /dev/null
 if ! docker run --platform linux/amd64 -e SCONE_NO_TIME_THREAD=1 --rm $SCONECTL_REPO/check_cpufeatures:latest &> /dev/null
 then
     echo -e "${RED}Docker does not seem to support all CPU features.${NC}"
@@ -137,7 +136,7 @@ fi
 
 
 echo -e "${BLUE}Checking that you have the local attestation service, the SGX Plugin, and the image pull secrets installed${NC}"
-#if ! sconectl scone_init &> /dev/null
+
 if ! ((kubectl get las | grep HEALTHY) && (kubectl get cas | grep HEALTHY) && (kubectl get sgxplugin | grep HEALTHY))
 then
     echo -e "${RED}It seems the Kubernetes cluster is not yet properly initialized!${NC}"

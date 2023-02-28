@@ -12,7 +12,7 @@ cas:
 
 policy:
   namespace: "$APP_NAMESPACE"
-  tolerate: "outdated-tcb"
+  tolerate: "outdated-tcb, insecure-configuration,hyperthreading, insecure-igpu, software-hardening-needed"
 
 # define environment variables
 # - this is can be done for each individual service defined in the services section 

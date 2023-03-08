@@ -42,6 +42,32 @@ env:
       value: "${RELEASE}-mariadb"      # overwrite default
     - name: "database_port"  # host name of MariaDB certificate
       value: "3306"      # overwrite default
+    - name: "sqlInitScript"
+      # For multi-line text values we need some extra indentation
+      # with fist line starting with " |".
+      # this will be fixed in a future version of scone_mesh.
+      value: |
+         |
+                   CREATE USER 'scontain'@'%'
+                     REQUIRE SUBJECT '/CN=MARIADB_CLIENT_CERT'
+                     AND ISSUER '/CN=MariaDB_CA';
+                   GRANT ALL PRIVILEGES ON *.* TO 'scontain'@'%' WITH GRANT OPTION;
+                   FLUSH PRIVILEGES;
+                   SHOW GRANTS FOR 'scontain'@'%';
+                   GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '$$SCONE::MYSQL_ROOT_PASSWORD$$';
+                   CREATE DATABASE document_db;
+                   CREATE TABLE document_db.document(
+                       record_id INT NOT NULL,
+                       content TEXT NOT NULL,
+                       owner VARCHAR(128) NOT NULL,
+                       PRIMARY KEY (record_id, owner)
+                   );
+                   CREATE TABLE document_db.account(
+                       username VARCHAR(128) PRIMARY KEY,
+                       hash BLOB NOT NULL,
+                       salt BLOB NOT NULL
+                   );
+
   # memcached-related handlebars:
     - name: "memcached_host"   # nginx host name
       value: "${RELEASE}-memcached" # overwrite default

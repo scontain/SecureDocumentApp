@@ -101,11 +101,11 @@ env:
 
 services:
   - name: memcached
-    image: $SCONECTL_REPO/memcached:latest
+    image: $SCONECTL_REPO/memcached:${VERSION}
   - name: nginx
-    image: $SCONECTL_REPO/nginx:latest
+    image: $SCONECTL_REPO/nginx:${VERSION}
   - name: mariadb
-    image: $SCONECTL_REPO/mariadb:latest
+    image: $SCONECTL_REPO/mariadb:${VERSION}
   - name: fastapi-scone
     image: $APP_IMAGE_REPO/secure_document_app
   - name: client

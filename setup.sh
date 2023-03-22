@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
+export VERSION=${VERSION:-latest}
 
 RED="\e[31m"
 BLUE='\e[34m'

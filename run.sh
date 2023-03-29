@@ -223,6 +223,7 @@ echo -e "${BLUE}build application and pushing policies:${NC} apply -f mesh.yaml"
 echo -e "${BLUE}  - this fails, if you do not have access to the SCONE CAS namespace"
 echo -e "  - update the namespace '${ORANGE}policy.namespace${NC}' to a unique name in '${ORANGE}mesh.yaml${NC}'"
 
+export CAS_URL="${CAS}.${CAS_NAMESPACE}"
 SCONE="\$SCONE" envsubst < mesh.yaml.template > mesh.yaml
 
 sconectl apply -f mesh.yaml --release "$RELEASE" $verbose $debug --set-version ${VERSION}

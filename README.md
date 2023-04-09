@@ -1,5 +1,18 @@
 # Confidential Document Manager Application
 
+## TL'DR
+
+```bash
+# define REPO to which you permitted to push container images
+REPO="<YOUR-REPO>" 
+# cleanup the last state
+rm -rf release.sh target;
+# execute all steps of this tutorial 
+./run.sh -i "$REPO" --release secure-doc-management
+```
+
+## Introduction
+
 This application demo is a confidential document web application. This service enables users to upload and download documents and ensures that the documents are always encrypted. Users can create accounts. We use a simple password-based authentication. For production, one should add a two-factor authentication. The application  consists of the following components:
 
 - a **Python FastAPI** service serving as the application's REST API,

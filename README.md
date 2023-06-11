@@ -3,8 +3,6 @@
 ## TL'DR
 
 ```bash
-# define REPO to which you are # define REPO to which you are permitted to push container images
-REPO="<YOUR-REPO>" 
 # In case you want to test a release candidate of `sconectl`, you can change the repo and the VERSION
 export SCONECTL_REPO=registry.scontain.com/cicd
 export VERSION=5.8.0-rc.25
@@ -13,6 +11,8 @@ unset SCONECTL_REPO
 unset VERSION
 # cleanup the last state
 rm -rf release.sh target
+# define REPO to which you are # define REPO to which you are permitted to push container images
+REPO="<YOUR-REPO>"
 # execute all steps of this tutorial
 ./run.sh -i "$REPO" --release secure-doc-management -v
 ```

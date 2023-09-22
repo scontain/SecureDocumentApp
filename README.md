@@ -3,9 +3,8 @@
 ## TL'DR
 
 ```bash
-# In case you want to test a release candidate of `sconectl`, you can change the repo and the VERSION
-export SCONECTL_REPO=registry.scontain.com/cicd
-export VERSION=5.8.0-rc.25
+export SCONECTL_REPO=registry.scontain.com/sconectl
+export VERSION=5.8.0
 # if you want to use the latest stable release, ensure that these variables are not set:
 unset SCONECTL_REPO
 unset VERSION
@@ -45,7 +44,7 @@ If you have a clean K8s cluster, you need to install the SCONE operator. CAS is 
 1. Install operator, LAS, and SGXPlugin
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/scontain/SH/master/5.8.0-rc.4/operator_controller | LAS_MANIFEST=https://raw.githubusercontent.com/scontain/manifests/main/5.8.0-rc.4/las-azure.yaml bash -s - --set-version 5.8.0-rc.4 --plugin --reconcile --update --secret-operator --verbose --username $REGISTRY_USERNAME --access-token $REGISTRY_ACCESS_TOKEN  --email $REGISTRY_EMAIL
+curl -fsSL https://raw.githubusercontent.com/scontain/SH/master/operator_controller | bash -s - --set-version 5.8.0 --plugin --reconcile --update --secret-operator --verbose --username $REGISTRY_USERNAME --access-token $REGISTRY_ACCESS_TOKEN  --email $REGISTRY_EMAIL
 ```
 
 2. `operator_controller` will create the `scone-system` namespace. Check the pods in `scone-system` with
@@ -57,7 +56,7 @@ kubectl get pods -n scone-system
 3. Once everything in `scone-system` is running and ready (check output of previous command), we can install CAS and provision using the `kubectl-provision` script.
 
 ```bash
-curl -fsSL  https://raw.githubusercontent.com/scontain/SH/master/5.8.0-rc.4/kubectl-provision | bash -s - cas cas --set-version 5.8.0-rc.4 --verbose
+kubectl provision cas cas --set-version 5.8.0 --verbose
 ```
 
 4. Check that CAS is HEALTHY before you continue to next steps.
@@ -76,10 +75,10 @@ Once CAS is HEALTHY, you're ready to go.
 export APP_IMAGE_REPO=example.registry.com
 ```
 
-2. Export the `sconectl` repo. For this tutorial, set it to `registry.scontain.com/cicd`
+2. Set the `sconectl` version to the `5.8.0` stable version.
 
 ```bash
-export SCONECTL_REPO=registry.scontain.com/cicd
+export VERSION=5.8.0
 ```
 
 3. Run the `check_prerequisites.sh` script. It will check things like the SCONE CRDs in your K8s cluster and your access to the SCONE registry.
@@ -117,6 +116,7 @@ source <(kubectl provision cas $CAS_SERVICE -n $CAS_NAMESPACE --print-public-key
 ```bash
 export RELEASE=secure-doc-management
 export APP_NAMESPACE="$RELEASE-$RANDOM-$RANDOM"
+export CAS_URL="$CAS_SERVICE.$CAS_NAMESPACE"
 SCONE="\$SCONE" envsubst < mesh.yaml.template > mesh.yaml
 ```
 

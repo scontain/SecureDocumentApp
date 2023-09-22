@@ -62,7 +62,7 @@ then
 fi
 
 echo -e "${BLUE}Checking that we can run container images for linux/amd64${NC}"
-if ! docker run  --network=host  linux/amd64 --rm hello-world &> /dev/null
+if ! docker run  --network=host --platform linux/amd64 --rm hello-world &> /dev/null
 then
     echo -e "${RED}Docker does not seem to support argument '--platform linux/amd64'"
     echo -e "Please ensure that you can run the latest version of docker (i.e.,  API version >= 1.40)" 

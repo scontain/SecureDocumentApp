@@ -29,6 +29,25 @@ This application demo is a confidential document web application. This service e
 
 All of these components run securely inside of enclaves using the SCONE framework. These services are also integrity protected, and attest each other transparently using TLS in conjunction with a SCONE Configuration and Attestation Service (CAS). Furthermore, the application protects the confidentiality and integrity of all data it receives. We deploy this application using `helm`.
 
+## Set up Azure Cluster (optional)
+
+In case you want to run this demo in an Azure cluster, you may consider the following commands to set up a cluster, using the  [Azure CLI](https://learn.microsoft.com/pt-br/cli/azure/install-azure-cli-linux?source=recommendations&pivots=apt).
+
+```bash
+# Export cluster configs
+export NUMBER_OF_CONFIDENTIAL_NODES=1
+export CLUSTER_NAME="aks-scone-cluster"
+export NODE_POOL_NAME="aksnodepool"
+export RESOURCE_GROUP="<RESOURCE_GROUP_NAME>"
+export NODE_FLAVOR="Standard_DC4s_v3"
+ 
+# Create cluster
+az aks create --name $CLUSTER_NAME --generate-ssh-keys --enable-addons confcom -c $NUMBER_OF_CONFIDENTIAL_NODES --node-vm-size $NODE_FLAVOR -g $RESOURCE_GROUP
+
+# Get kubeconfig
+az aks get-credentials --name $CLUSTER_NAME --resource-group $RESOURCE_GROUP  -f $CLUSTER_NAME
+```
+
 ## Building and running the application
 
 No time to read all the steps? We put the sconectl and helm steps in script `run.sh`. Just execute `./run.sh` and have a happy sconification!

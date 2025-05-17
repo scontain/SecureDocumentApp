@@ -1,3 +1,5 @@
+mariadb-debug.log
+mariadb-production.log
 release.sh
 target
 .kube

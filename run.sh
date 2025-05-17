@@ -238,20 +238,26 @@ SCONE="\$SCONE" envsubst < mesh.yaml.template > mesh.yaml
 
 sconectl apply -f mesh.yaml --release "$RELEASE" $verbose $debug --set-version ${VERSION}
 
-echo -e "${BLUE}Uninstalling application in case it was previously installed:${NC} helm uninstall ${namespace_args} ${RELEASE}"
+echo -e "${BLUE}Uninstalling application in case it was previously installed:${NC} helm uninstall ${namespace_arg} ${RELEASE}"
 echo -e "${BLUE} - this requires that 'kubectl' gives access to a Kubernetes cluster${NC}"
 
 helm uninstall $namespace_arg ${release} 2> /dev/null || true
 
-echo -e "${BLUE}install application:${NC} helm install ${namespace_args} ${RELEASE} target/helm/"
+echo -e "${BLUE}install application:${NC} helm install ${namespace_arg} ${RELEASE} target/helm/"
 
 helm install $namespace_arg ${release} target/helm/
 
-echo -e "${BLUE}Check the logs by executing:${NC} kubectl logs ${namespace_args} ${RELEASE}<TAB>"
-echo -e "${BLUE}Uninstall by executing:${NC} helm uninstall ${namespace_args} ${RELEASE}"
+echo -e "${BLUE}Check the logs by executing:${NC} kubectl logs ${namespace_arg} ${RELEASE}<TAB>"
+echo -e "${BLUE}Uninstall by executing:${NC} helm uninstall ${namespace_arg} ${RELEASE}"
 
 APP_NAME="memcached" ./check_pods.sh
 APP_NAME="mariadb" ./check_pods.sh
+if [[ $debug != "" ]] ; then
+  kubectl logs --follow $namespace_arg secure-doc-management-debug-mariadb-0 > mariadb-debug.log &
+else
+  kubectl logs --follow $namespace_arg secure-doc-management-mariadb-0 > mariadb-production.log &
+fi
+
 APP_NAME="fastapi-scone" ./check_pods.sh
 APP_NAME="client" ./check_pods.sh
 APP_NAME="nginx" ./check_pods.sh

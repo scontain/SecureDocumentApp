@@ -18,26 +18,25 @@ def get_env_or_die(env_var):
     return value
 
 
-def create_document(nginx_addr, user, passwd, doc_id):
-    ''' Creates a document and returns the ID
-    returns ducument id (string)
-    '''
-    letters = string.ascii_letters
-    res = requests.post("https://{}/documents/create_document".format(nginx_addr),
-        auth=(user, passwd), data=json.dumps({
+def create_document(nginx_addr: str, user: str, passwd: str, doc_id: str) -> requests.Response:
+    """Creates a document and returns the response."""
+    url = f"https://{nginx_addr}/documents/create_document"
+    auth = (user, passwd)
+
+    def _post() -> requests.Response:
+        return requests.post(url, auth=auth, json={
             "record_id": doc_id,
-            "content": ''.join(random.choice(letters) for i in range(15))
-        }))
+            "content": ''.join(random.choices(string.ascii_letters, k=15))
+        })
+
+    res = _post()
+
     if res.status_code == 429:
         log.info("ouch! rate limit caught us. Retrying in 70 seconds...")
         time.sleep(70)
-        res = requests.post("https://{}/documents/create_document".format(nginx_addr),
-        auth=(user, passwd), data=json.dumps({
-            "record_id": doc_id,
-            "content": ''.join(random.choice(letters) for i in range(15))
-        }))
-    return res
+        res = _post()
 
+    return res
 
 def read_document(nginx_addr, user, passwd, doc_id):
     '''
